@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
-*.pth.env
+*.pth
+.env
 venv/
 .idea/
 .vscode/
