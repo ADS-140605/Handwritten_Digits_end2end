@@ -15,7 +15,7 @@ from model import MNISTCNN
 from train import train
 
 try:
-	import matplotlib.pyplot as plt
+	import matplotlib.pyplot as plt  # type: ignore[import-not-found]
 except ImportError:
 	plt = None
 
@@ -79,7 +79,11 @@ def main():
 	parser.add_argument("--data-dir", type=str, default=os.path.join("data", "mnist"))
 	parser.add_argument("--output-dir", type=str, default="outputs")
 	parser.add_argument("--download", action="store_true")
-	parser.add_argument("--model-path", type=str, default="mnist_cnn.pth")
+	parser.add_argument(
+		"--model-path",
+		type=str,
+		default=os.path.join("..", "backend", "storage", "models", "original", "mnist_cnn.pt"),
+	)
 	parser.add_argument("--save-model", action="store_true")
 	args = parser.parse_args()
 
@@ -110,6 +114,7 @@ def main():
 
 	if os.path.exists(args.model_path):
 		print(f"Found existing checkpoint: {args.model_path}")
+		model.load_state_dict(torch.load(args.model_path, map_location=device))
 
 	for epoch in range(1, args.epochs + 1):
 		start_time = time.time()
@@ -127,6 +132,7 @@ def main():
 	save_metrics(args.output_dir, history)
 
 	if args.save_model:
+		os.makedirs(os.path.dirname(args.model_path), exist_ok=True)
 		torch.save(model.state_dict(), args.model_path)
 		print(f"Model saved to {args.model_path}")
 

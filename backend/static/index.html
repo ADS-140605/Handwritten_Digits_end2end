@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Handwritten Digit Studio</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">FastAPI + MNIST</p>
+          <h1>Draw, paste, or upload one handwritten digit.</h1>
+          <p class="lede">
+            Choose a saved model, run a prediction, or train a temporary model on the server without
+            touching the original checkpoint.
+          </p>
+        </div>
+        <div class="status-pill" id="healthPill">Connecting...</div>
+      </section>
+
+      <section class="layout">
+        <div class="panel canvas-panel">
+          <div class="panel-head">
+            <div>
+              <h2>Slate</h2>
+              <p>Use the mouse, paste an image, or upload a file.</p>
+            </div>
+            <div class="panel-actions">
+              <button class="ghost" id="clearBtn" type="button">Clear</button>
+              <label class="ghost file-button">
+                Upload
+                <input id="fileInput" type="file" accept="image/*" hidden />
+              </label>
+            </div>
+          </div>
+
+          <div class="canvas-wrap">
+            <canvas id="digitCanvas" width="512" height="512" aria-label="Digit drawing canvas"></canvas>
+          </div>
+
+          <p class="hint">Tip: paste an image with Ctrl+V. The canvas stays responsive on mobile.</p>
+        </div>
+
+        <aside class="panel controls-panel">
+          <div class="stack">
+            <div>
+              <label for="modelSelect">Model</label>
+              <select id="modelSelect"></select>
+            </div>
+
+            <div class="prediction-box">
+              <div class="prediction-label">Prediction</div>
+              <div class="prediction-value" id="predictionValue">-</div>
+              <div class="prediction-sub" id="predictionMeta">No prediction yet.</div>
+            </div>
+
+            <button class="primary" id="predictBtn" type="button">Predict digit</button>
+
+            <div class="progress-card">
+              <h3>Temporary retrain</h3>
+              <div class="grid-2">
+                <label>
+                  Base model
+                  <select id="baseModelSelect"></select>
+                </label>
+                <label>
+                  Epochs
+                  <input id="epochsInput" type="number" min="1" max="30" value="2" />
+                </label>
+                <label>
+                  Learning rate
+                  <input id="lrInput" type="number" min="0.00001" step="0.0001" value="0.001" />
+                </label>
+                <label>
+                  Batch size
+                  <input id="batchSizeInput" type="number" min="1" max="512" value="64" />
+                </label>
+              </div>
+              <label class="checkbox">
+                <input id="downloadInput" type="checkbox" />
+                Download MNIST if it is missing
+              </label>
+              <button class="secondary" id="retrainBtn" type="button">Train temporary model</button>
+              <div class="job-state" id="jobState">Idle.</div>
+            </div>
+
+            <div class="results-card">
+              <h3>Top probabilities</h3>
+              <div id="topKList" class="topk"></div>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

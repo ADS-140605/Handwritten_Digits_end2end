@@ -1,0 +1,6 @@
+streamlit>=1.36
+streamlit-drawable-canvas>=0.9.3
+torch>=2.3
+torchvision>=0.18
+pillow>=10.0
+numpy>=1.26
