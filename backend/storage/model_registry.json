@@ -1,0 +1,46 @@
+{
+  "models": [
+    {
+      "id": "original",
+      "name": "Original model",
+      "kind": "original",
+      "base_model_id": null,
+      "created_at": "2026-05-06T00:00:00Z",
+      "status": "ready",
+      "available": true,
+      "path": "C:\\Users\\Asus\\OneDrive\\Desktop\\MNIST-digits_recognization\\Handwritten_Digits_end2end\\backend\\storage\\models\\original\\mnist_cnn.pt",
+      "metrics": {},
+      "description": "Immutable base checkpoint."
+    },
+    {
+      "id": "temp-20260506-171311-58b32b51",
+      "name": "Temporary model b32b51",
+      "kind": "temporary",
+      "base_model_id": "original",
+      "created_at": "2026-05-06T17:13:11Z",
+      "status": "ready",
+      "available": true,
+      "path": "C:\\Users\\Asus\\OneDrive\\Desktop\\MNIST-digits_recognization\\Handwritten_Digits_end2end\\backend\\storage\\models\\custom\\temp-20260506-171311-58b32b51\\mnist_cnn.pt",
+      "metrics": {
+        "final_test_accuracy": 98.76,
+        "final_test_loss": 0.0361674387473613
+      },
+      "description": "Retrained from original."
+    },
+    {
+      "id": "temp-20260506-171926-5f07855a",
+      "name": "Temporary model 07855a",
+      "kind": "temporary",
+      "base_model_id": "original",
+      "created_at": "2026-05-06T17:19:26Z",
+      "status": "ready",
+      "available": true,
+      "path": "C:\\Users\\Asus\\OneDrive\\Desktop\\MNIST-digits_recognization\\Handwritten_Digits_end2end\\backend\\storage\\models\\custom\\temp-20260506-171926-5f07855a\\mnist_cnn.pt",
+      "metrics": {
+        "final_test_accuracy": 99.22,
+        "final_test_loss": 0.026043083443073555
+      },
+      "description": "Retrained from original."
+    }
+  ]
+}

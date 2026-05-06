@@ -34,7 +34,6 @@ STORAGE_DIR = BACKEND_DIR / "storage"
 MODELS_DIR = STORAGE_DIR / "models"
 REGISTRY_PATH = STORAGE_DIR / "model_registry.json"
 
-
 def _load_registry() -> List[Dict[str, Any]]:
     if not REGISTRY_PATH.exists():
         return []
