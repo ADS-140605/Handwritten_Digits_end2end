@@ -10,7 +10,12 @@ import streamlit as st
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 
-from backend.ml import predict_with_model
+from backend.ml import (
+    default_device,
+    ensure_storage_layout,
+    predict_with_model,
+    train_model,
+)
 
 
 # Custom CSS for better styling and mobile optimization
@@ -31,7 +36,8 @@ CUSTOM_CSS = """
 ROOT_DIR = Path(__file__).resolve().parent
 BACKEND_DIR = ROOT_DIR / "backend"
 STORAGE_DIR = BACKEND_DIR / "storage"
-MODELS_DIR = Path(r"backend\storage\models")
+MODELS_DIR = STORAGE_DIR / "models"
+ORIGINAL_MODEL_PATH = MODELS_DIR / "original" / "mnist_cnn.pt"
 REGISTRY_PATH = STORAGE_DIR / "model_registry.json"
 
 def _load_registry() -> List[Dict[str, Any]]:
@@ -59,7 +65,7 @@ def _resolve_model_path(record: Dict[str, Any]) -> Optional[Path]:
 
     model_id = record.get("id")
     if model_id == "original":
-        candidate = MODELS_DIR / "original" / "mnist_cnn.pt"
+        candidate = ORIGINAL_MODEL_PATH
         if candidate.exists():
             return candidate
     if isinstance(model_id, str) and model_id.startswith("temp-"):
@@ -86,7 +92,7 @@ def _load_models() -> List[Dict[str, Any]]:
         )
 
     if not models:
-        fallback = MODELS_DIR / "original" / "mnist_cnn.pt"
+        fallback = ORIGINAL_MODEL_PATH
         if fallback.exists():
             models.append(
                 {
@@ -119,9 +125,28 @@ st.set_page_config(page_title="Handwritten Digit Studio", page_icon="9", layout=
 st.title("Handwritten Digit Studio")
 st.caption("Draw a digit, upload an image, and test the MNIST checkpoint directly in Streamlit.")
 
+ensure_storage_layout()
 models = _load_models()
 if not models:
-    st.error("No trained model checkpoint was found. Put a model at backend/storage/models/original/mnist_cnn.pt.")
+    st.error("No trained model checkpoint was found.")
+    st.write(
+        "This app can train a new original MNIST model and save it to "
+        f"{ORIGINAL_MODEL_PATH}."
+    )
+    if st.button("Train original model now"):
+        with st.spinner("Training original MNIST model on the best available device..."):
+            train_model(
+                base_model_path=None,
+                output_path=ORIGINAL_MODEL_PATH,
+                epochs=3,
+                lr=1e-3,
+                batch_size=64,
+                test_batch_size=1000,
+                download=True,
+                device=default_device(),
+            )
+        st.success(f"Model trained and saved to {ORIGINAL_MODEL_PATH}.")
+        st.experimental_rerun()
     st.stop()
 
 with st.sidebar:

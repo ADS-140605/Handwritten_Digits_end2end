@@ -7,7 +7,10 @@ from PIL import Image, ImageDraw
 import torch
 from torchvision import transforms
 
-from model import MNISTCNN
+try:
+    from .model import MNISTCNN
+except ImportError:
+    from model import MNISTCNN
 
 
 def otsu_threshold(gray):

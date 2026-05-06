@@ -2,6 +2,7 @@ import argparse
 import csv
 import json
 import os
+from pathlib import Path
 import time
 
 import torch
@@ -10,9 +11,14 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
-from evaluate import evaluate
-from model import MNISTCNN
-from train import train
+try:
+    from .evaluate import evaluate
+    from .model import MNISTCNN
+    from .train import train
+except ImportError:
+    from evaluate import evaluate
+    from model import MNISTCNN
+    from train import train
 
 try:
     import matplotlib.pyplot as plt
@@ -123,24 +129,38 @@ def main():
 
     parser.add_argument("--download", action="store_true")
 
+    default_model_path = Path("backend") / "storage" / "models" / "original" / "mnist_cnn.pt"
     parser.add_argument(
         "--model-path",
         type=str,
-        default= "backend\\storage\\models\\original\\mnist_cnn.pt"
+        default=str(default_model_path),
+        help="Path to save or load the MNIST model checkpoint",
     )
-    print(f"Default model path: {parser.get_default('model_path')}")
-
-    parser.add_argument("--save-model", action="store_true")
+    parser.add_argument(
+        "--device",
+        choices=["cpu", "cuda"],
+        default="cuda" if torch.cuda.is_available() else "cpu",
+        help="Device to use for training and evaluation",
+    )
+    parser.add_argument(
+        "--no-save-model",
+        action="store_false",
+        dest="save_model",
+        help="Do not save the trained model checkpoint",
+    )
 
     args = parser.parse_args()
 
-    device = torch.device(
-        "cuda" if torch.cuda.is_available() else "cpu"
-    )
+    if args.device == "cuda" and not torch.cuda.is_available():
+        raise RuntimeError("CUDA device requested but not available")
 
+    device = torch.device(args.device)
     print(f"Using device: {device}")
+    if device.type == "cuda":
+        print(f"GPU: {torch.cuda.get_device_name(0)}")
+        print(f"CUDA Version: {torch.version.cuda}")
 
-    print(f"Default model path: {parser.get_default('model_path')}")
+    print(f"Default model path: {default_model_path}")
 
     transform = transforms.Compose(
         [
@@ -163,12 +183,13 @@ def main():
         transform=transform,
     )
 
+    use_cuda = device.type == "cuda"
     train_loader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
         shuffle=True,
         num_workers=2,
-        pin_memory=True,
+        pin_memory=use_cuda,
     )
 
     test_loader = DataLoader(
@@ -176,7 +197,7 @@ def main():
         batch_size=args.test_batch_size,
         shuffle=False,
         num_workers=2,
-        pin_memory=True,
+        pin_memory=use_cuda,
     )
 
     model = MNISTCNN().to(device)
@@ -204,13 +225,13 @@ def main():
     }
 
     best_acc = 0.0
+    checkpoint_path = Path(args.model_path)
 
-    if os.path.exists(args.model_path):
-        print(f"Loading existing checkpoint: {args.model_path}")
-
+    if checkpoint_path.exists():
+        print(f"Loading existing checkpoint: {checkpoint_path}")
         model.load_state_dict(
             torch.load(
-                args.model_path,
+                checkpoint_path,
                 map_location=device,
             )
         )
@@ -258,16 +279,8 @@ def main():
             best_acc = test_acc
 
             if args.save_model:
-                os.makedirs(
-                    os.path.dirname(args.model_path),
-                    exist_ok=True,
-                )
-
-                torch.save(
-                    model.state_dict(),
-                    args.model_path,
-                )
-
+                checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+                torch.save(model.state_dict(), checkpoint_path)
                 print(
                     f"Best model saved "
                     f"(Accuracy: {best_acc:.2f}%)"
