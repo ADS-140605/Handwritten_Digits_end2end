@@ -135,6 +135,7 @@ def main():
             "mnist_cnn.pt",
         ),
     )
+    print(f"Default model path: {parser.get_default('model_path')}")
 
     parser.add_argument("--save-model", action="store_true")
 
@@ -146,7 +147,7 @@ def main():
 
     print(f"Using device: {device}")
 
-    
+    print(f"Default model path: {parser.get_default('model_path')}")
 
     transform = transforms.Compose(
         [
