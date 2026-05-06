@@ -198,24 +198,76 @@ def predict_from_image(image_path, model_path, output_dir, device, min_area=30):
 
 
 def main():
-	parser = argparse.ArgumentParser(description="Predict handwritten digits from a full image")
-	parser.add_argument("--image", type=str, required=True, help="Path to handwritten digit image (jpg/png)")
-	parser.add_argument("--model-path", type=str, default="mnist_cnn.pth")
-	parser.add_argument("--output-dir", type=str, default="outputs")
-	parser.add_argument("--min-area", type=int, default=30, help="Minimum component area (lower=more sensitive)")
-	args = parser.parse_args()
 
-	if not os.path.exists(args.image):
-		raise FileNotFoundError(f"Input image not found: {args.image}")
-	if not os.path.exists(args.model_path):
-		raise FileNotFoundError(
-			f"Model checkpoint not found: {args.model_path}. Train and save first."
-		)
+    parser = argparse.ArgumentParser(
+        description="Predict handwritten digits from a full image"
+    )
 
-	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-	print(f"Using device: {device}")
-	predict_from_image(args.image, args.model_path, args.output_dir, device, min_area=args.min_area)
+    parser.add_argument(
+        "--image",
+        type=str,
+        required=True,
+        help="Path to handwritten digit image (jpg/png)"
+    )
+
+    parser.add_argument(
+        "--model-path",
+        type=str,
+        default=os.path.join(
+            "..",
+            "backend",
+            "storage",
+            "models",
+            "original",
+            "mnist_cnn.pt",
+        ),
+    )
+
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default="outputs"
+    )
+
+    parser.add_argument(
+        "--min-area",
+        type=int,
+        default=30,
+        help="Minimum component area (lower = more sensitive)"
+    )
+
+    args = parser.parse_args()
+
+    if not os.path.exists(args.image):
+        raise FileNotFoundError(
+            f"Input image not found: {args.image}"
+        )
+
+    if not os.path.exists(args.model_path):
+        raise FileNotFoundError(
+            f"Model checkpoint not found: {args.model_path}"
+        )
+
+    device = torch.device(
+        "cuda" if torch.cuda.is_available() else "cpu"
+    )
+
+    print(f"Using device: {device}")
+
+    if torch.cuda.is_available():
+        print(f"GPU: {torch.cuda.get_device_name(0)}")
+        print(f"CUDA Version: {torch.version.cuda}")
+    else:
+        print("CUDA not available. Using CPU.")
+
+    predict_from_image(
+        args.image,
+        args.model_path,
+        args.output_dir,
+        device,
+        min_area=args.min_area,
+    )
 
 
 if __name__ == "__main__":
-	main()
+    main()

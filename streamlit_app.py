@@ -31,7 +31,7 @@ CUSTOM_CSS = """
 ROOT_DIR = Path(__file__).resolve().parent
 BACKEND_DIR = ROOT_DIR / "backend"
 STORAGE_DIR = BACKEND_DIR / "storage"
-MODELS_DIR = STORAGE_DIR / "models"
+MODELS_DIR = Path(r"backend\storage\models")
 REGISTRY_PATH = STORAGE_DIR / "model_registry.json"
 
 def _load_registry() -> List[Dict[str, Any]]:
