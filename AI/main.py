@@ -126,14 +126,7 @@ def main():
     parser.add_argument(
         "--model-path",
         type=str,
-        default=os.path.join(
-            "..",
-            "backend",
-            "storage",
-            "models",
-            "original",
-            "mnist_cnn.pt",
-        ),
+        default= "backend\\storage\\models\\original\\mnist_cnn.pt"
     )
     print(f"Default model path: {parser.get_default('model_path')}")
 
